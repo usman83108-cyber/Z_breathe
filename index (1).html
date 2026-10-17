@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0b1714" />
+  <title>Zbreathe — Air Quality, Clearly</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f7f4; --ink: #14231e; --muted: #6d7c74; --green: #1c7656;
+      --green-dark: #0c3428; --mint: #dff4e9; --line: #e2e9e3; --white: #fff;
+      --shadow: 0 18px 55px rgba(22, 53, 39, .08); --radius: 22px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--ink); background: var(--bg); font-family: "DM Sans", sans-serif; }
+    button, input { font: inherit; }
+    button { cursor: pointer; }
+    .shell { min-height: 100vh; }
+    .topbar { display:flex; align-items:center; justify-content:space-between; padding: 22px clamp(20px, 5vw, 76px); background:rgba(255,255,255,.84); border-bottom:1px solid var(--line); }
+    .brand { display:flex; align-items:center; gap:11px; font-family:Manrope,sans-serif; font-size:22px; font-weight:800; letter-spacing:-.8px; }
+    .brand-mark { display:grid; place-items:center; width:39px; height:39px; border-radius:13px; color:white; background:var(--green); }
+    .brand-mark svg { width:23px; height:23px; }
+    .nav { display:flex; align-items:center; gap:26px; color:#62736a; font-size:13px; font-weight:600; }
+    .nav a { color:inherit; text-decoration:none; }
+    .nav a:hover { color:var(--green); }
+    .live { display:flex; align-items:center; gap:8px; padding:9px 12px; border:1px solid #cde9d9; border-radius:999px; color:#176342; background:#f0fbf4; font-size:12px; font-weight:700; }
+    .dot { width:7px; height:7px; border-radius:50%; background:#25a56b; box-shadow:0 0 0 4px #d8f3e4; }
+    main { max-width:1250px; margin:auto; padding:44px clamp(20px, 5vw, 48px) 60px; }
+    .eyebrow { display:flex; align-items:center; gap:9px; text-transform:uppercase; letter-spacing:2px; font-size:11px; color:var(--green); font-weight:800; }
+    h1,h2,h3,p { margin-top:0; }
+    h1 { font-family:Manrope,sans-serif; font-size:clamp(35px,5vw,58px); line-height:1.06; letter-spacing:-2.6px; max-width:720px; margin:17px 0 15px; }
+    h1 span { color:var(--green); }
+    .intro { color:var(--muted); line-height:1.7; max-width:610px; font-size:15px; margin-bottom:27px; }
+    .search-panel { display:flex; gap:10px; max-width:670px; padding:8px; background:white; border:1px solid var(--line); border-radius:17px; box-shadow:var(--shadow); }
+    .search-icon { align-self:center; margin-left:12px; color:#799087; }
+    .search-panel input { flex:1; min-width:0; padding:12px 4px; border:0; outline:0; color:var(--ink); background:transparent; }
+    .search-panel input::placeholder { color:#9aa79f; }
+    .primary { display:inline-flex; align-items:center; justify-content:center; gap:9px; border:0; border-radius:12px; padding:13px 20px; background:var(--green); color:white; font-weight:700; transition:.2s; }
+    .primary:hover { background:#155e44; transform:translateY(-1px); }
+    .primary:disabled { opacity:.65; cursor:wait; transform:none; }
+    .error { display:none; margin-top:12px; max-width:670px; padding:12px 14px; color:#963d30; background:#fff0ed; border:1px solid #f5d3cc; border-radius:12px; font-size:13px; line-height:1.5; }
+    .hero-grid { display:grid; grid-template-columns:1.1fr .9fr; gap:20px; margin-top:35px; }
+    .card { background:var(--white); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); }
+    .aqi-card { padding:27px; color:white; background:linear-gradient(135deg,#123d2e 0%,#1b6c4c 100%); border:0; position:relative; overflow:hidden; }
+    .aqi-card:after { content:""; position:absolute; width:290px;height:290px;border:1px solid rgba(255,255,255,.1);border-radius:50%;right:-95px;top:-115px;box-shadow:0 0 0 32px rgba(255,255,255,.025),0 0 0 65px rgba(255,255,255,.02); }
+    .card-head { display:flex; justify-content:space-between; align-items:center; gap:12px; position:relative; z-index:1; }
+    .card-label { font-size:12px; letter-spacing:1.3px; text-transform:uppercase; font-weight:700; opacity:.78; }
+    .pill { display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:rgba(255,255,255,.13); font-size:11px; font-weight:700; }
+    .aqi-main { display:flex; align-items:flex-end; gap:19px; margin-top:36px; position:relative; z-index:1; }
+    .aqi-number { font-family:Manrope,sans-serif; font-size:clamp(72px,9vw,105px); font-weight:800; line-height:.9; letter-spacing:-5px; }
+    .aqi-state { padding-bottom:7px; }
+    .aqi-state strong { display:block; font-size:20px; margin-bottom:5px; }
+    .aqi-state span { color:#d1e9dc; font-size:12px; }
+    .aqi-footer { display:flex; justify-content:space-between; gap:16px; border-top:1px solid rgba(255,255,255,.18); margin-top:29px; padding-top:18px; position:relative; z-index:1; }
+    .small-stat span { display:block; color:#c3e1d0; font-size:11px; margin-bottom:6px; }
+    .small-stat strong { font-size:15px; }
+    .panel { padding:26px; }
+    .panel h2 { font-family:Manrope,sans-serif; font-size:19px; letter-spacing:-.5px; margin-bottom:7px; }
+    .sub { color:var(--muted); font-size:12px; line-height:1.6; }
+    .metric-list { display:grid; gap:20px; margin-top:26px; }
+    .metric-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; font-size:13px; }
+    .metric-top span { color:var(--muted); }
+    .metric-top strong { font-size:15px; }
+    .track { height:7px; border-radius:99px; background:#edf2ee; overflow:hidden; }
+    .fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#70c99a,#1c7656); width:0; transition:width .5s; }
+    .section-heading { display:flex; justify-content:space-between; align-items:end; gap:16px; margin:37px 0 16px; }
+    .section-heading h2 { font-family:Manrope,sans-serif; font-size:24px; letter-spacing:-.9px; margin:0 0 6px; }
+    .section-heading p { margin:0; color:var(--muted); font-size:13px; }
+    .metrics-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .metric-card { padding:21px; }
+    .metric-icon { display:grid; place-items:center; width:40px;height:40px;border-radius:13px;background:var(--mint);color:var(--green); margin-bottom:18px; }
+    .metric-icon svg { width:21px;height:21px; }
+    .metric-card .name { color:var(--muted); font-size:12px; margin-bottom:8px; }
+    .metric-card .value { font-family:Manrope,sans-serif; font-size:29px; font-weight:800; letter-spacing:-1px; }
+    .metric-card .unit { font-family:"DM Sans",sans-serif; font-size:12px; font-weight:500; color:var(--muted); letter-spacing:0; }
+    .tip-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .tip-card { display:flex; gap:15px; padding:22px; }
+    .tip-card h3 { font-size:14px; margin:2px 0 7px; }
+    .tip-card p { color:var(--muted); font-size:12px; line-height:1.65; margin:0; }
+    .tip-icon { flex-shrink:0; display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:#fff2d9;color:#94630e; }
+    .tip-icon svg { width:20px;height:20px; }
+    .notice { display:flex; gap:11px; margin-top:20px; padding:14px 16px; border-radius:13px; background:#eef4f0; color:#52675c; font-size:11px; line-height:1.6; }
+    .notice svg { flex-shrink:0; width:17px;height:17px; }
+    footer { display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:22px clamp(20px,5vw,76px); background:#0b2119; color:#c2d5ca; font-size:11px; }
+    footer strong { color:white; }
+    .footer-note { opacity:.75; }
+    .loading { display:none; align-items:center; gap:8px; color:var(--muted); font-size:12px; margin-top:12px; }
+    .spinner { width:14px;height:14px;border:2px solid #cfe2d6;border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    @media (max-width:800px) { .nav { display:none; } .hero-grid { grid-template-columns:1fr; } .metrics-grid { grid-template-columns:1fr 1fr; } }
+    @media (max-width:520px) { main { padding-top:30px; } .search-panel { flex-wrap:wrap; } .search-panel input { flex-basis:calc(100% - 60px); } .search-panel .primary { width:100%; } .aqi-card,.panel { padding:21px; } .metrics-grid,.tip-grid { grid-template-columns:1fr; } .section-heading { align-items:start; flex-direction:column; } .aqi-number { font-size:78px; } }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M12 21c4.8-2.8 7.2-6.5 7.2-10.8C19.2 6 16.3 3.3 12 2 7.7 3.3 4.8 6 4.8 10.2 4.8 14.5 7.2 18.2 12 21Z" stroke="currentColor" stroke-width="1.7"/><path d="M12 20V8m0 7-4-4m4 1 3.6-3.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      </div>
+      Zbreathe
+    </div>
+    <nav class="nav" aria-label="Main navigation">
+      <a href="#overview">Overview</a><a href="#pollutants">Air metrics</a><a href="#guidance">Wellness tips</a>
+    </nav>
+    <div class="live"><span class="dot"></span> Air insights</div>
+  </header>
+
+  <main>
+    <section id="overview">
+      <div class="eyebrow"><span>✳</span> Breathe with awareness</div>
+      <h1>Know your air.<br><span>Protect your everyday.</span></h1>
+      <p class="intro">Explore an air-quality estimate for your area and get a clearer view of the environmental factors that shape the air around you.</p>
+      <form class="search-panel" id="locationForm">
+        <svg class="search-icon" width="21" height="21" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.3 4.3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <input id="locationInput" type="text" placeholder="Enter a city, neighbourhood or road…" value="Shivamogga" aria-label="Location to check" maxlength="120" required>
+        <button class="primary" id="searchButton" type="submit">Check air quality <span aria-hidden="true">↗</span></button>
+      </form>
+      <div class="error" id="errorMessage" role="alert"></div>
+      <div class="loading" id="loadingMessage"><span class="spinner"></span> Preparing your air-quality estimate…</div>
+
+      <div class="hero-grid">
+        <article class="card aqi-card">
+          <div class="card-head">
+            <span class="card-label">Air quality index</span>
+            <span class="pill"><span>●</span> Model estimate</span>
+          </div>
+          <div class="aqi-main">
+            <div class="aqi-number" id="aqiValue">—</div>
+            <div class="aqi-state">
+              <strong id="aqiStatus">Ready to check</strong>
+              <span id="locationLabel">Search for a location above</span>
+            </div>
+          </div>
+          <div class="aqi-footer">
+            <div class="small-stat"><span>PM2.5 concentration</span><strong id="pm25Value">— µg/m³</strong></div>
+            <div class="small-stat"><span>Estimate time</span><strong id="timeValue">—</strong></div>
+          </div>
+        </article>
+
+        <article class="card panel">
+          <h2>Pollutant snapshot</h2>
+          <p class="sub">A quick look at the particulate estimates returned by the model.</p>
+          <div class="metric-list">
+            <div>
+              <div class="metric-top"><span>PM2.5 · Fine particles</span><strong id="pm25BarLabel">—</strong></div>
+              <div class="track"><div class="fill" id="pm25Bar"></div></div>
+            </div>
+            <div>
+              <div class="metric-top"><span>PM10 · Coarse particles</span><strong id="pm10BarLabel">—</strong></div>
+              <div class="track"><div class="fill" id="pm10Bar"></div></div>
+            </div>
+            <div>
+              <div class="metric-top"><span>Wind speed</span><strong id="windBarLabel">—</strong></div>
+              <div class="track"><div class="fill" id="windBar"></div></div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="pollutants">
+      <div class="section-heading">
+        <div><h2>Environmental indicators</h2><p>Values returned by your current Python prediction model.</p></div>
+      </div>
+      <div class="metrics-grid">
+        <article class="card metric-card">
+          <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.7" stroke-dasharray="2 3"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></div>
+          <div class="name">Fine particles · PM2.5</div><div class="value"><span id="pm25Tile">—</span> <span class="unit">µg/m³</span></div>
+        </article>
+        <article class="card metric-card">
+          <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8h11a3 3 0 1 0-3-3M3 12h15a3 3 0 1 1-3 3M5 16h6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="name">Coarse particles · PM10</div><div class="value"><span id="pm10Tile">—</span> <span class="unit">µg/m³</span></div>
+        </article>
+        <article class="card metric-card">
+          <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 8h11a3 3 0 1 0-3-3M3 12h17M3 16h10a3 3 0 1 1-3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+          <div class="name">Estimated wind speed</div><div class="value"><span id="windTile">—</span> <span class="unit">km/h</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section id="guidance">
+      <div class="section-heading">
+        <div><h2>Make informed choices</h2><p>General awareness tips for everyday air-quality decisions.</p></div>
+      </div>
+      <div class="tip-grid">
+        <article class="card tip-card">
+          <div class="tip-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.7"/></svg></div>
+          <div><h3>Plan outdoor time</h3><p>Check a trusted local air-quality source before strenuous outdoor activity, especially if you are sensitive to pollution.</p></div>
+        </article>
+        <article class="card tip-card">
+          <div class="tip-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20V8l8-4 8 4v12M8 20v-6h8v6M3 20h18" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><h3>Keep indoor air in mind</h3><p>Reduce indoor smoke and dust where possible, and follow local public-health guidance when pollution levels are elevated.</p></div>
+        </article>
+      </div>
+      <div class="notice">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.7"/><path d="M12 11v5m0-8h.01" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+        <div><strong>Data transparency:</strong> This page displays estimates generated by the current demo model. They are not live sensor readings, official AQI measurements, or medical advice. Use a verified local monitoring service for current conditions.</div>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <div><strong>Zbreathe</strong> &nbsp; · &nbsp; Air awareness, made clearer.</div>
+    <div class="footer-note">Demo project · Model-generated estimates · Not for emergency decisions</div>
+  </footer>
+</div>
+<script>
+  const form = document.getElementById('locationForm');
+  const input = document.getElementById('locationInput');
+  const button = document.getElementById('searchButton');
+  const errorBox = document.getElementById('errorMessage');
+  const loading = document.getElementById('loadingMessage');
+
+  function setText(id, value) { document.getElementById(id).textContent = value; }
+  function setBar(id, value, max) {
+    const width = Math.max(2, Math.min(100, (Number(value) / max) * 100));
+    document.getElementById(id).style.width = width + '%';
+  }
+  function getStatusLabel(raw) {
+    const status = String(raw || '').toUpperCase();
+    if (status.includes('GOOD')) return 'Good';
+    if (status.includes('MODERATE')) return 'Moderate';
+    if (status.includes('WARNING')) return 'Elevated';
+    if (status.includes('ALERT')) return 'High';
+    return raw || 'Estimate available';
+  }
+  function showError(message) {
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+  }
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const location = input.value.trim();
+    errorBox.style.display = 'none';
+    if (!location) {
+      showError('Please enter a location first.');
+      input.focus();
+      return;
+    }
+    button.disabled = true;
+    loading.style.display = 'flex';
+    try {
+      const response = await fetch('/api/air-quality?location=' + encodeURIComponent(location));
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || data.message || 'Could not retrieve the estimate. Check that the Flask server is running.');
+      setText('aqiValue', data.aqi_score ?? '—');
+      setText('aqiStatus', getStatusLabel(data.safety_status));
+      setText('locationLabel', data.location || location);
+      setText('pm25Value', (data.pm25 ?? '—') + ' µg/m³');
+      setText('timeValue', data.time || '—');
+      setText('pm25BarLabel', (data.pm25 ?? '—') + ' µg/m³');
+      setText('pm10BarLabel', (data.pm10 ?? '—') + ' µg/m³');
+      setText('windBarLabel', (data.wind_speed ?? '—') + ' km/h');
+      setText('pm25Tile', data.pm25 ?? '—');
+      setText('pm10Tile', data.pm10 ?? '—');
+      setText('windTile', data.wind_speed ?? '—');
+      setBar('pm25Bar', data.pm25 ?? 0, 75);
+      setBar('pm10Bar', data.pm10 ?? 0, 150);
+      setBar('windBar', data.wind_speed ?? 0, 30);
+      if (data.data_type !== 'simulated_model_estimate' && data.is_real_measurement !== false) {
+        // Keep the page transparent even if a future backend does not return metadata.
+        document.querySelector('.aqi-card .pill').textContent = 'Model response';
+      }
+    } catch (error) {
+      showError((error.message || 'Unable to connect to the backend.') + ' Make sure you opened this page through http://127.0.0.1:5000/ and not directly from the HTML file.');
+    } finally {
+      button.disabled = false;
+      loading.style.display = 'none';
+    }
+  });
+
+  // Load the initial sample automatically after the page opens.
+  window.addEventListener('DOMContentLoaded', () => form.requestSubmit());
+</script>
+</body>
+</html>
